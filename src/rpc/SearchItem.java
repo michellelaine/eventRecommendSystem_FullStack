@@ -2,6 +2,7 @@ package rpc;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -12,6 +13,12 @@ import javax.servlet.http.HttpServletResponse;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.List;
+
+import db.DBConnection;
+import db.DBConnectionFactory;
+import entity.Item;
 
 /**
  * Servlet implementation class SearchItem
@@ -32,21 +39,40 @@ public class SearchItem extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		         
-        // return Json response  --> a Json array   
-        JSONArray array = new JSONArray();
-        String username = "";
-		if(request.getParameter("username") != null) {
-			username = request.getParameter("username");
-		}
-        try {
-        	array.put(new JSONObject().put("username", "abcd"));
-        	array.put(new JSONObject().put("username", "1234"));
-        	array.put(new JSONObject().put("username", username));
-        }catch(JSONException e){
+		double lat = Double.parseDouble(request.getParameter("lat"));
+		double lon = Double.parseDouble(request.getParameter("lon"));
+		String term = request.getParameter("term");
+		
+		DBConnection connection = DBConnectionFactory.getConnection();//create DB connection
+		List<Item> items = connection.searchItems(lat, lon, term);
+		connection.close();
+		
+		List<JSONObject> list = new ArrayList<>();
+		try {
+			for (Item item : items) {
+				JSONObject obj = item.toJSONObject();
+				list.add(obj);
+			}
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
-        RpcHelper.writeJsonArray(response, array);
+		JSONArray array = new JSONArray(list);		
+		RpcHelper.writeJsonArray(response, array);
+		         
+        // return Json response  --> a Json array   
+//        JSONArray array = new JSONArray();
+//        String username = "";
+//		if(request.getParameter("username") != null) {
+//			username = request.getParameter("username");
+//		}
+//        try {
+//        	array.put(new JSONObject().put("username", "abcd"));
+//        	array.put(new JSONObject().put("username", "yhr"));
+//        	array.put(new JSONObject().put("username", username));
+//        }catch(JSONException e){
+//			e.printStackTrace();
+//		}
+//        RpcHelper.writeJsonArray(response, array);
         
         
 /*     

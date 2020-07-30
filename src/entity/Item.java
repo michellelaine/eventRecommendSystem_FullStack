@@ -6,6 +6,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+//one Item is one event
 public class Item {
 	private String itemId;
 	private String name;
@@ -44,7 +45,7 @@ public class Item {
 	public double getDistance() {
 		return distance;
 	}
-	
+	//Item constructor
 	private Item(ItemBuilder builder) {
 		this.itemId = builder.itemId;
 		this.name = builder.name;
@@ -55,7 +56,7 @@ public class Item {
 		this.url = builder.url;
 		this.distance = builder.distance;
 	}
-	//Item class to JSONObject
+	//Item class to JSONObject, future use
 	public JSONObject toJSONObject(){
 		JSONObject obj = new JSONObject();
 		try {
@@ -74,6 +75,36 @@ public class Item {
 		return obj;
 	}
 	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((itemId == null) ? 0 : itemId.hashCode());
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Item other = (Item) obj;
+		if (itemId == null) {
+			if (other.itemId != null)
+				return false;
+		} else if (!itemId.equals(other.itemId))
+			return false;
+		return true;
+	}
+
+	/*
+	 * Also use builder pattern to create instance.
+	   	   - Easier to use  because you don’t need to call a constructor with long parameter list
+	   	   - Easier to implement because  you don’t need to provide constructors with different 
+	   	     combinations of private fields.
+	 */
 	public static class ItemBuilder {
 		private String itemId;
 		private String name;
